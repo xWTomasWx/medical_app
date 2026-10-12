@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'services/notification_service.dart';
+// import 'services/notification_service.dart';
 import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';
+import 'providers/settings_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -23,15 +24,19 @@ void main() async {
   );
 }
 
-class MedicalApp extends StatelessWidget {
+class MedicalApp extends ConsumerWidget {
   const MedicalApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+
     return MaterialApp(
       title: 'Citas Médicas',
       navigatorKey: navigatorKey,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: settings.themeMode,
       home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );

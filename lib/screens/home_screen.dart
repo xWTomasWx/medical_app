@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../providers/appointment_provider.dart';
 import '../models/appointment.dart';
 import 'notification_action_screen.dart';
+import '../widgets/app_drawer.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -13,6 +14,7 @@ class HomeScreen extends ConsumerWidget {
     final appointments = ref.watch(appointmentProvider);
 
     return Scaffold(
+      drawer: const AppDrawer(currentRoute: 'home'),
       appBar: AppBar(
         title: const Text('Mis Citas'),
         actions: [
@@ -86,7 +88,6 @@ class _AppointmentCard extends StatelessWidget {
         statusIcon = Icons.cancel;
         break;
       case AppointmentStatus.pending:
-      default:
         statusColor = Colors.orange;
         statusText = 'Pendiente';
         statusIcon = Icons.access_time_filled;
@@ -118,9 +119,9 @@ class _AppointmentCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: statusColor.withOpacity(0.5)),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.5)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

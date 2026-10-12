@@ -5,6 +5,32 @@ final appointmentProvider = NotifierProvider<AppointmentNotifier, List<Appointme
   return AppointmentNotifier();
 });
 
+final pastAppointmentsProvider = Provider<List<Appointment>>((ref) {
+  return [
+    Appointment(
+      id: 'past-1',
+      doctorName: 'Dr. Roberto Sánchez',
+      specialty: 'Cardiología',
+      dateTime: DateTime.now().subtract(const Duration(days: 14, hours: 2)),
+      status: AppointmentStatus.accepted,
+    ),
+    Appointment(
+      id: 'past-2',
+      doctorName: 'Dra. María Gómez',
+      specialty: 'Dermatología',
+      dateTime: DateTime.now().subtract(const Duration(days: 35, hours: 4)),
+      status: AppointmentStatus.accepted,
+    ),
+    Appointment(
+      id: 'past-3',
+      doctorName: 'Dr. Alejandro Morales',
+      specialty: 'Traumatología',
+      dateTime: DateTime.now().subtract(const Duration(days: 72, hours: 1)),
+      status: AppointmentStatus.accepted,
+    ),
+  ];
+});
+
 class AppointmentNotifier extends Notifier<List<Appointment>> {
   @override
   List<Appointment> build() {
