@@ -19,7 +19,7 @@ class SettingsState {
     this.biometricEnabled = false,
     this.userName = 'Usuario',
     this.userEmail = 'usuario@email.com',
-    this.userPhone = '+54 9 11 4567-8901',
+    this.userPhone = '+56 9 1234 5678',
   });
 
   SettingsState copyWith({

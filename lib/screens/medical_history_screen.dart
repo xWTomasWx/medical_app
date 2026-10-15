@@ -87,7 +87,7 @@ class _PastAppointmentCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        appointment.specialty,
+                        '${appointment.specialty} • ${appointment.facility}',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),

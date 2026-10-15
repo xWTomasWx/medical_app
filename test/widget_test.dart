@@ -87,13 +87,55 @@ void main() {
 
     // Verificar citas pasadas
     expect(find.text('Dr. Roberto Sánchez'), findsOneWidget);
-    expect(find.text('Cardiología'), findsOneWidget);
+    expect(find.textContaining('Médico General'), findsOneWidget);
     expect(find.text('Dra. María Gómez'), findsOneWidget);
-    expect(find.text('Dermatología'), findsOneWidget);
+    expect(find.textContaining('Nutricionista'), findsOneWidget);
     expect(find.text('Completada'), findsNothing);
 
     // Verificar ausencia de filtros y resúmenes
     expect(find.text('Ficha N° HC-482910 • Plan Activo'), findsNothing);
     expect(find.text('Filtros'), findsNothing);
+  });
+
+  testWidgets('Flujo de confirmación e inasistencia con selección de motivo', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MedicalApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // 1. Verificar el banner de Acción Requerida (2 turnos pendientes)
+    expect(find.text('2 Turnos pendientes de confirmación'), findsOneWidget);
+
+    // 2. Tocar la cita de Dra. María Gómez para abrir la pantalla de detalle
+    await tester.tap(find.text('Dra. María Gómez'));
+    await tester.pumpAndSettle();
+
+    // 3. Verificar que se abrió la pantalla de detalle y presionar "No podré asistir"
+    expect(find.text('Confirmar Turno'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('No podré asistir (Liberar turno)'),
+      200.0,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('No podré asistir (Liberar turno)'));
+    await tester.pumpAndSettle();
+
+    // 4. Verificar que el diálogo de inasistencia está abierto y confirmar liberación
+    expect(find.text('Avisar Inasistencia'), findsOneWidget);
+    expect(find.text('Conflicto de horario o trabajo'), findsOneWidget);
+    await tester.tap(find.text('Liberar Turno'));
+    await tester.pumpAndSettle();
+
+    // 5. Volver a la pantalla principal
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+
+    // 6. Verificar que el contador ahora bajó a 1 turno pendiente
+    expect(find.text('1 Turno pendiente de confirmación'), findsOneWidget);
+    expect(find.text('2 Turnos pendientes de confirmación'), findsNothing);
   });
 }
