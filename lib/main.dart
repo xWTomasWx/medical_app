@@ -9,19 +9,40 @@ import 'package:intl/date_symbol_data_local.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+class _CombinedTextScaler extends TextScaler {
+  const _CombinedTextScaler(this.platformScaler, this.appScaleFactor);
+
+  final TextScaler platformScaler;
+  final double appScaleFactor;
+
+  @override
+  double scale(double fontSize) {
+    return platformScaler.scale(fontSize * appScaleFactor);
+  }
+
+  @override
+  double get textScaleFactor => platformScaler.scale(1) * appScaleFactor;
+
+  @override
+  bool operator ==(Object other) {
+    return other is _CombinedTextScaler &&
+        other.platformScaler == platformScaler &&
+        other.appScaleFactor == appScaleFactor;
+  }
+
+  @override
+  int get hashCode => Object.hash(platformScaler, appScaleFactor);
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // await Firebase.initializeApp(); // Descomenta esto después de configurar Firebase
   // await NotificationService().init();
 
   await initializeDateFormatting('es_ES', null);
 
-  runApp(
-    const ProviderScope(
-      child: MedicalApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MedicalApp()));
 }
 
 class MedicalApp extends ConsumerWidget {
@@ -38,6 +59,19 @@ class MedicalApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: settings.themeMode,
       home: const HomeScreen(),
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: _CombinedTextScaler(
+              mediaQuery.textScaler,
+              settings.textSize.scaleFactor,
+            ),
+          ),
+          child: child!,
+        );
+      },
       debugShowCheckedModeBanner: false,
     );
   }

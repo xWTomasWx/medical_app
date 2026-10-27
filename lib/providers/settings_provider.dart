@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+enum AppTextSize {
+  normal(1.0, 'Normal'),
+  large(1.2, 'Grande'),
+  extraLarge(1.4, 'Muy grande');
+
+  const AppTextSize(this.scaleFactor, this.label);
+
+  final double scaleFactor;
+  final String label;
+}
+
 class SettingsState {
   final ThemeMode themeMode;
+  final AppTextSize textSize;
   final bool notificationsEnabled;
   final bool appointmentReminders;
   final bool soundEnabled;
@@ -13,6 +25,7 @@ class SettingsState {
 
   const SettingsState({
     this.themeMode = ThemeMode.system,
+    this.textSize = AppTextSize.normal,
     this.notificationsEnabled = true,
     this.appointmentReminders = true,
     this.soundEnabled = true,
@@ -24,6 +37,7 @@ class SettingsState {
 
   SettingsState copyWith({
     ThemeMode? themeMode,
+    AppTextSize? textSize,
     bool? notificationsEnabled,
     bool? appointmentReminders,
     bool? soundEnabled,
@@ -34,6 +48,7 @@ class SettingsState {
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
+      textSize: textSize ?? this.textSize,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       appointmentReminders: appointmentReminders ?? this.appointmentReminders,
       soundEnabled: soundEnabled ?? this.soundEnabled,
@@ -53,6 +68,10 @@ class SettingsNotifier extends Notifier<SettingsState> {
 
   void setThemeMode(ThemeMode mode) {
     state = state.copyWith(themeMode: mode);
+  }
+
+  void setTextSize(AppTextSize textSize) {
+    state = state.copyWith(textSize: textSize);
   }
 
   void toggleNotifications(bool value) {
@@ -77,11 +96,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
   }
 
   void updateProfile({String? name, String? email, String? phone}) {
-    state = state.copyWith(
-      userName: name,
-      userEmail: email,
-      userPhone: phone,
-    );
+    state = state.copyWith(userName: name, userEmail: email, userPhone: phone);
   }
 
   void resetSettings() {

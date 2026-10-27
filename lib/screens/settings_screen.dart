@@ -12,14 +12,16 @@ class SettingsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Configuración'),
-      ),
+      appBar: AppBar(title: const Text('Configuración')),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 12),
         children: [
           // Perfil del paciente
-          _buildSectionHeader(context, 'Perfil del Paciente', Icons.person_outline),
+          _buildSectionHeader(
+            context,
+            'Perfil del Paciente',
+            Icons.person_outline,
+          ),
           Card(
             child: ListTile(
               leading: CircleAvatar(
@@ -27,11 +29,11 @@ class SettingsScreen extends ConsumerWidget {
                 child: Text(
                   settings.userName.isNotEmpty
                       ? settings.userName
-                          .split(' ')
-                          .map((e) => e.isNotEmpty ? e[0] : '')
-                          .take(2)
-                          .join()
-                          .toUpperCase()
+                            .split(' ')
+                            .map((e) => e.isNotEmpty ? e[0] : '')
+                            .take(2)
+                            .join()
+                            .toUpperCase()
                       : 'P',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -57,6 +59,41 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    'Tamaño del texto',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Elige el tamaño que te resulte más cómodo:',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<AppTextSize>(
+                    initialValue: settings.textSize,
+                    decoration: const InputDecoration(
+                      labelText: 'Selecciona tamaño',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: AppTextSize.values
+                        .map(
+                          (textSize) => DropdownMenuItem<AppTextSize>(
+                            value: textSize,
+                            child: Text(textSize.label),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        notifier.setTextSize(value);
+                      }
+                    },
+                  ),
+                  const Divider(height: 24),
                   Text(
                     'Tema de la aplicación',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -104,14 +141,20 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 12),
 
           // Notificaciones
-          _buildSectionHeader(context, 'Notificaciones', Icons.notifications_none_outlined),
+          _buildSectionHeader(
+            context,
+            'Notificaciones',
+            Icons.notifications_none_outlined,
+          ),
           Card(
             child: Column(
               children: [
                 SwitchListTile(
                   secondary: const Icon(Icons.notifications_active_outlined),
                   title: const Text('Notificaciones push'),
-                  subtitle: const Text('Recibir avisos sobre el estado de tus citas'),
+                  subtitle: const Text(
+                    'Recibir avisos sobre el estado de tus citas',
+                  ),
                   value: settings.notificationsEnabled,
                   onChanged: (value) => notifier.toggleNotifications(value),
                 ),
@@ -119,7 +162,9 @@ class SettingsScreen extends ConsumerWidget {
                 SwitchListTile(
                   secondary: const Icon(Icons.alarm_outlined),
                   title: const Text('Recordatorio de 24 horas'),
-                  subtitle: const Text('Aviso previo al día de tu consulta médica'),
+                  subtitle: const Text(
+                    'Aviso previo al día de tu consulta médica',
+                  ),
                   value: settings.appointmentReminders,
                   onChanged: settings.notificationsEnabled
                       ? (value) => notifier.toggleAppointmentReminders(value)
@@ -142,12 +187,18 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 12),
 
           // Seguridad
-          _buildSectionHeader(context, 'Seguridad y Privacidad', Icons.security_outlined),
+          _buildSectionHeader(
+            context,
+            'Seguridad y Privacidad',
+            Icons.security_outlined,
+          ),
           Card(
             child: SwitchListTile(
               secondary: const Icon(Icons.fingerprint_rounded),
               title: const Text('Bloqueo biométrico'),
-              subtitle: const Text('Requerir huella dactilar o reconocimiento facial'),
+              subtitle: const Text(
+                'Requerir huella dactilar o reconocimiento facial',
+              ),
               value: settings.biometricEnabled,
               onChanged: (value) => notifier.toggleBiometric(value),
             ),
@@ -156,7 +207,11 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 12),
 
           // Soporte y Datos
-          _buildSectionHeader(context, 'Información y Soporte', Icons.info_outline),
+          _buildSectionHeader(
+            context,
+            'Información y Soporte',
+            Icons.info_outline,
+          ),
           Card(
             child: Column(
               children: [
@@ -207,12 +262,17 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1, indent: 56),
                 ListTile(
-                  leading: Icon(Icons.restart_alt, color: theme.colorScheme.error),
+                  leading: Icon(
+                    Icons.restart_alt,
+                    color: theme.colorScheme.error,
+                  ),
                   title: Text(
                     'Restablecer ajustes',
                     style: TextStyle(color: theme.colorScheme.error),
                   ),
-                  subtitle: const Text('Volver a la configuración predeterminada'),
+                  subtitle: const Text(
+                    'Volver a la configuración predeterminada',
+                  ),
                   onTap: () => _confirmResetSettings(context, notifier),
                 ),
               ],
@@ -224,7 +284,11 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, IconData icon) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    IconData icon,
+  ) {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),

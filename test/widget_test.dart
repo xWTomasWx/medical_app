@@ -9,19 +9,19 @@ void main() {
     await initializeDateFormatting('es_ES', null);
   });
 
-  testWidgets('Carga inicial, Drawer y navegación a Configuración', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MedicalApp(),
-      ),
-    );
+  testWidgets('Carga inicial, Drawer y navegación a Configuración', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: MedicalApp()));
     await tester.pumpAndSettle();
 
     // 1. Verifica pantalla principal
     expect(find.text('Mis Citas'), findsOneWidget);
 
     // 2. Abre el Drawer
-    final ScaffoldState scaffoldState = tester.firstState(find.byType(Scaffold));
+    final ScaffoldState scaffoldState = tester.firstState(
+      find.byType(Scaffold),
+    );
     scaffoldState.openDrawer();
     await tester.pumpAndSettle();
 
@@ -38,8 +38,13 @@ void main() {
     // 5. Verifica que los elementos clave de Configuración estén presentes
     expect(find.text('Configuración'), findsOneWidget);
     expect(find.text('Perfil del Paciente'), findsOneWidget);
-    expect(find.byIcon(Icons.edit_outlined), findsNothing); // Sin botón de editar
+    expect(
+      find.byIcon(Icons.edit_outlined),
+      findsNothing,
+    ); // Sin botón de editar
     expect(find.text('Apariencia'), findsOneWidget);
+    expect(find.text('Tamaño del texto'), findsOneWidget);
+    expect(find.text('Normal'), findsOneWidget);
     expect(find.text('Tema de la aplicación'), findsOneWidget);
     expect(find.text('Notificaciones'), findsOneWidget);
     expect(find.text('Notificaciones push'), findsOneWidget);
@@ -49,8 +54,24 @@ void main() {
     await tester.tap(find.text('Oscuro'));
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Normal'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Muy grande').last);
+    await tester.pumpAndSettle();
+    final textScaleFactor = MediaQuery.textScalerOf(
+      tester.element(find.text('Apariencia')),
+    ).scale(10);
+    expect(textScaleFactor, closeTo(14, 0.01));
+
+    await tester.tap(find.text('Muy grande'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Normal').last);
+    await tester.pumpAndSettle();
+
     // 7. Prueba interactiva: cambiar switch de Notificaciones Push
     final switchFinder = find.byType(Switch).first;
+    await tester.ensureVisible(switchFinder);
+    await tester.pumpAndSettle();
     await tester.tap(switchFinder);
     await tester.pumpAndSettle();
 
@@ -65,16 +86,16 @@ void main() {
     expect(find.textContaining('v1.0.0'), findsNothing);
   });
 
-  testWidgets('Navegación a Historial Clínico con citas pasadas', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MedicalApp(),
-      ),
-    );
+  testWidgets('Navegación a Historial Clínico con citas pasadas', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: MedicalApp()));
     await tester.pumpAndSettle();
 
     // Abrir Drawer
-    final ScaffoldState scaffoldState = tester.firstState(find.byType(Scaffold));
+    final ScaffoldState scaffoldState = tester.firstState(
+      find.byType(Scaffold),
+    );
     scaffoldState.openDrawer();
     await tester.pumpAndSettle();
 
@@ -97,12 +118,10 @@ void main() {
     expect(find.text('Filtros'), findsNothing);
   });
 
-  testWidgets('Flujo de confirmación e inasistencia con selección de motivo', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MedicalApp(),
-      ),
-    );
+  testWidgets('Flujo de confirmación e inasistencia con selección de motivo', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: MedicalApp()));
     await tester.pumpAndSettle();
 
     // 1. Verificar el banner de Acción Requerida (2 turnos pendientes)
