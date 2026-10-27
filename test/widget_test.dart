@@ -9,11 +9,32 @@ void main() {
     await initializeDateFormatting('es_ES', null);
   });
 
+  Future<void> openHomeScreen(WidgetTester tester) async {
+    await tester.pump(const Duration(milliseconds: 1800));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets(
+    'Muestra el logo en la splash y luego abre la pantalla principal',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(const ProviderScope(child: MedicalApp()));
+      await tester.pump();
+
+      expect(find.text('Citas Médicas'), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+      expect(find.text('Mis Citas'), findsNothing);
+
+      await openHomeScreen(tester);
+
+      expect(find.text('Mis Citas'), findsOneWidget);
+    },
+  );
+
   testWidgets('Carga inicial, Drawer y navegación a Configuración', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: MedicalApp()));
-    await tester.pumpAndSettle();
+    await openHomeScreen(tester);
 
     // 1. Verifica pantalla principal
     expect(find.text('Mis Citas'), findsOneWidget);
@@ -90,7 +111,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: MedicalApp()));
-    await tester.pumpAndSettle();
+    await openHomeScreen(tester);
 
     // Abrir Drawer
     final ScaffoldState scaffoldState = tester.firstState(
@@ -122,7 +143,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: MedicalApp()));
-    await tester.pumpAndSettle();
+    await openHomeScreen(tester);
 
     // 1. Verificar el banner de Acción Requerida (2 turnos pendientes)
     expect(find.text('2 Turnos pendientes de confirmación'), findsOneWidget);
