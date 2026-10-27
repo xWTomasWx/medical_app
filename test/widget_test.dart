@@ -27,8 +27,69 @@ void main() {
       await openHomeScreen(tester);
 
       expect(find.text('Mis Citas'), findsOneWidget);
+      expect(find.text('Agendar'), findsOneWidget);
+
+      await tester.tap(find.text('Agendar'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text(
+          'Si necesitas agendar una cita, visita el sitio de Telesalud.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Visitar Telesalud'), findsOneWidget);
+      await tester.tap(find.text('Cerrar'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Ver tutorial para confirmar citas'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cómo confirmar una cita'), findsOneWidget);
+      expect(find.byIcon(Icons.play_circle_outline), findsOneWidget);
     },
   );
+
+  testWidgets('Simula cancelación por profesional y permite agendar nuevamente', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: MedicalApp()));
+    await openHomeScreen(tester);
+
+    await tester.tap(
+      find.byTooltip('Simular aviso de profesional no disponible'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Cambio en tu cita'), findsOneWidget);
+    expect(find.text('Visitar Telesalud'), findsOneWidget);
+    await tester.tap(find.text('Cerrar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Cancelada por el profesional'), findsOneWidget);
+    expect(
+      find.text(
+        'Cancelada por el profesional debido a un inconveniente de horario.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Agendar nuevamente'), findsOneWidget);
+
+    await tester.tap(find.text('Agendar nuevamente'));
+    await tester.pumpAndSettle();
+    expect(find.text('Visitar Telesalud'), findsOneWidget);
+    await tester.tap(find.text('Cerrar'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Dr. Roberto Sánchez'));
+    await tester.pumpAndSettle();
+    expect(find.text('Cambié de opinión: Sí podré asistir'), findsNothing);
+    expect(
+      find.text(
+        'Tu aviso oportuno permitió que el centro médico libere este horario para otro paciente en lista de espera.',
+      ),
+      findsNothing,
+    );
+  });
 
   testWidgets('Carga inicial, Drawer y navegación a Configuración', (
     WidgetTester tester,
@@ -154,14 +215,27 @@ void main() {
 
     // 3. Verificar que se abrió la pantalla de detalle y presionar "No podré asistir"
     expect(find.text('Confirmar Turno'), findsOneWidget);
+    final confirmButton = find.text('Confirmar cita');
+    final cancelButton = find.text('Cancelar cita');
+    expect(confirmButton, findsOneWidget);
+    expect(cancelButton, findsOneWidget);
+    expect(
+      tester.getCenter(confirmButton).dy,
+      closeTo(tester.getCenter(cancelButton).dy, 1),
+    );
+    expect(
+      tester.getTopLeft(cancelButton).dy,
+      lessThan(tester.getTopLeft(find.byType(Card).first).dy),
+    );
+
     await tester.scrollUntilVisible(
-      find.text('No podré asistir (Liberar turno)'),
+      cancelButton,
       200.0,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('No podré asistir (Liberar turno)'));
+    await tester.tap(cancelButton);
     await tester.pumpAndSettle();
 
     // 4. Verificar que el diálogo de inasistencia está abierto y confirmar liberación

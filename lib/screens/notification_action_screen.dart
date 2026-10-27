@@ -9,18 +9,15 @@ import '../widgets/app_bar_logo_title.dart';
 class NotificationActionScreen extends ConsumerWidget {
   final String appointmentId;
 
-  const NotificationActionScreen({
-    super.key,
-    required this.appointmentId,
-  });
+  const NotificationActionScreen({super.key, required this.appointmentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appointments = ref.watch(appointmentProvider);
     final appointment = appointments.cast<Appointment?>().firstWhere(
-          (a) => a?.id == appointmentId,
-          orElse: () => null,
-        );
+      (a) => a?.id == appointmentId,
+      orElse: () => null,
+    );
 
     if (appointment == null) {
       return Scaffold(
@@ -33,6 +30,12 @@ class NotificationActionScreen extends ConsumerWidget {
     final isPending = appointment.status == AppointmentStatus.pending;
     final isAccepted = appointment.status == AppointmentStatus.accepted;
     final isCancelled = appointment.status == AppointmentStatus.cancelled;
+    final isCancelledByProfessional =
+        isCancelled &&
+        (appointment.cancellationReason?.startsWith(
+              'Cancelada por el profesional',
+            ) ??
+            false);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -53,14 +56,28 @@ class NotificationActionScreen extends ConsumerWidget {
               _buildStatusHeader(context, appointment),
               const SizedBox(height: 20),
 
+              _buildActionButtons(
+                context,
+                ref,
+                appointment,
+                isPending: isPending,
+                isAccepted: isAccepted,
+                isCancelledByProfessional: isCancelledByProfessional,
+              ),
+              const SizedBox(height: 20),
+
               // Tarjeta de detalles del turno
               Card(
                 elevation: 0,
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.35,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
-                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    color: theme.colorScheme.outlineVariant.withValues(
+                      alpha: 0.5,
+                    ),
                   ),
                 ),
                 child: Padding(
@@ -78,7 +95,8 @@ class NotificationActionScreen extends ConsumerWidget {
                         context,
                         icon: Icons.category_outlined,
                         label: 'Tipo de atención',
-                        value: '${appointment.appointmentType} • ${appointment.specialty}',
+                        value:
+                            '${appointment.appointmentType} • ${appointment.specialty}',
                       ),
                       const Divider(height: 20),
                       _buildDetailRow(
@@ -92,14 +110,20 @@ class NotificationActionScreen extends ConsumerWidget {
                         context,
                         icon: Icons.calendar_today_outlined,
                         label: 'Fecha',
-                        value: DateFormat('EEEE, dd MMMM yyyy', 'es_ES').format(appointment.dateTime),
+                        value: DateFormat(
+                          'EEEE, dd MMMM yyyy',
+                          'es_ES',
+                        ).format(appointment.dateTime),
                       ),
                       const Divider(height: 20),
                       _buildDetailRow(
                         context,
                         icon: Icons.access_time_outlined,
                         label: 'Hora',
-                        value: DateFormat('hh:mm a', 'es_ES').format(appointment.dateTime),
+                        value: DateFormat(
+                          'hh:mm a',
+                          'es_ES',
+                        ).format(appointment.dateTime),
                       ),
                       const Divider(height: 20),
                       _buildDetailRow(
@@ -108,7 +132,8 @@ class NotificationActionScreen extends ConsumerWidget {
                         label: 'Sector de atención',
                         value: appointment.location,
                       ),
-                      if (appointment.note != null && appointment.note!.isNotEmpty) ...[
+                      if (appointment.note != null &&
+                          appointment.note!.isNotEmpty) ...[
                         const Divider(height: 20),
                         _buildDetailRow(
                           context,
@@ -125,10 +150,13 @@ class NotificationActionScreen extends ConsumerWidget {
               const SizedBox(height: 16),
 
               // Sección de Indicaciones (si vienen en el Excel)
-              if (appointment.indications != null && appointment.indications!.isNotEmpty) ...[
+              if (appointment.indications != null &&
+                  appointment.indications!.isNotEmpty) ...[
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.25),
+                  color: theme.colorScheme.primaryContainer.withValues(
+                    alpha: 0.25,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                     side: BorderSide(
@@ -142,7 +170,11 @@ class NotificationActionScreen extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.notes_rounded, size: 20, color: theme.colorScheme.primary),
+                            Icon(
+                              Icons.notes_rounded,
+                              size: 20,
+                              color: theme.colorScheme.primary,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'Indicaciones',
@@ -161,7 +193,8 @@ class NotificationActionScreen extends ConsumerWidget {
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                              color: theme.colorScheme.outlineVariant
+                                  .withValues(alpha: 0.5),
                             ),
                           ),
                           child: Text(
@@ -183,16 +216,24 @@ class NotificationActionScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
+                    color: theme.colorScheme.errorContainer.withValues(
+                      alpha: 0.4,
+                    ),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.5)),
+                    border: Border.all(
+                      color: theme.colorScheme.error.withValues(alpha: 0.5),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.cancel_outlined, size: 20, color: theme.colorScheme.error),
+                          Icon(
+                            Icons.cancel_outlined,
+                            size: 20,
+                            color: theme.colorScheme.error,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             'Inasistencia notificada',
@@ -210,142 +251,205 @@ class NotificationActionScreen extends ConsumerWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Tu aviso oportuno permitió que el centro médico libere este horario para otro paciente en lista de espera.',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                      if (!isCancelledByProfessional) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Tu aviso oportuno permitió que el centro médico libere este horario para otro paciente en lista de espera.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-              ],
-
-              // Botones de acción según el estado
-              if (isPending) ...[
-                FilledButton.icon(
-                  onPressed: () {
-                    ref.read(appointmentProvider.notifier).acceptAppointment(appointmentId);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('✓ ¡Asistencia confirmada! El centro médico ha sido notificado.'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  icon: const Icon(Icons.check_circle_outline, size: 24),
-                  label: const Text(
-                    'Confirmar Asistencia',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: () async {
-                    final reason = await DeclineReasonDialog.show(
-                      context,
-                      doctorName: appointment.doctorName,
-                      specialty: appointment.specialty,
-                    );
-                    if (reason != null && context.mounted) {
-                      ref.read(appointmentProvider.notifier).cancelAppointment(appointmentId, reason);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Turno liberado. Gracias por avisar oportunamente.'),
-                        ),
-                      );
-                    }
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: theme.colorScheme.error,
-                    side: BorderSide(color: theme.colorScheme.error, width: 1.5),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  icon: const Icon(Icons.event_busy, size: 24),
-                  label: const Text(
-                    'No podré asistir (Liberar turno)',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ] else if (isAccepted) ...[
-                FilledButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Cita con ${appointment.doctorName} añadida al calendario de tu dispositivo.',
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  icon: const Icon(Icons.calendar_month, size: 24),
-                  label: const Text(
-                    'Añadir a mi Calendario',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextButton.icon(
-                  onPressed: () async {
-                    final reason = await DeclineReasonDialog.show(
-                      context,
-                      doctorName: appointment.doctorName,
-                      specialty: appointment.specialty,
-                    );
-                    if (reason != null && context.mounted) {
-                      ref.read(appointmentProvider.notifier).cancelAppointment(appointmentId, reason);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Inasistencia registrada. El turno ha sido liberado.'),
-                        ),
-                      );
-                    }
-                  },
-                  style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
-                  icon: const Icon(Icons.close),
-                  label: const Text('¿Cambio de planes? Avisar inasistencia'),
-                ),
-              ] else if (isCancelled) ...[
-                OutlinedButton.icon(
-                  onPressed: () {
-                    ref.read(appointmentProvider.notifier).acceptAppointment(appointmentId);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('¡Turno recuperado y asistencia confirmada!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.restore, color: Colors.green),
-                  label: const Text(
-                    'Cambié de opinión: Sí podré asistir',
-                    style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.green),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
               ],
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildActionButtons(
+    BuildContext context,
+    WidgetRef ref,
+    Appointment appointment, {
+    required bool isPending,
+    required bool isAccepted,
+    required bool isCancelledByProfessional,
+  }) {
+    final theme = Theme.of(context);
+
+    Future<void> declineAppointment(String successMessage) async {
+      final reason = await DeclineReasonDialog.show(
+        context,
+        doctorName: appointment.doctorName,
+        specialty: appointment.specialty,
+      );
+      if (reason != null && context.mounted) {
+        ref
+            .read(appointmentProvider.notifier)
+            .cancelAppointment(appointmentId, reason);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(successMessage)));
+      }
+    }
+
+    if (isPending) {
+      return Row(
+        children: [
+          Expanded(
+            child: FilledButton(
+              onPressed: () {
+                ref
+                    .read(appointmentProvider.notifier)
+                    .acceptAppointment(appointmentId);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      '✓ ¡Asistencia confirmada! El centro médico ha sido notificado.',
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.green.shade700,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle_outline, size: 24),
+                  SizedBox(height: 6),
+                  Text(
+                    'Confirmar cita',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => declineAppointment(
+                'Turno liberado. Gracias por avisar oportunamente.',
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: theme.colorScheme.error,
+                side: BorderSide(color: theme.colorScheme.error, width: 1.5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.event_busy, size: 24),
+                  SizedBox(height: 6),
+                  Text(
+                    'Cancelar cita',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    if (isAccepted) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FilledButton.icon(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Cita con ${appointment.doctorName} añadida al calendario de tu dispositivo.',
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: const Icon(Icons.calendar_month, size: 24),
+            label: const Text(
+              'Añadir a mi Calendario',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: () => declineAppointment(
+              'Inasistencia registrada. El turno ha sido liberado.',
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.error,
+            ),
+            icon: const Icon(Icons.close),
+            label: const Text('Cancelar cita'),
+          ),
+        ],
+      );
+    }
+
+    if (isCancelledByProfessional) {
+      return const SizedBox.shrink();
+    }
+
+    if (appointment.status == AppointmentStatus.cancelled) {
+      return OutlinedButton.icon(
+        onPressed: () {
+          ref
+              .read(appointmentProvider.notifier)
+              .acceptAppointment(appointmentId);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('¡Turno recuperado y asistencia confirmada!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+        icon: const Icon(Icons.restore, color: Colors.green),
+        label: const Text(
+          'Cambié de opinión: Sí podré asistir',
+          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.green),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildStatusHeader(BuildContext context, Appointment appointment) {
@@ -437,7 +541,9 @@ class NotificationActionScreen extends ConsumerWidget {
           decoration: BoxDecoration(
             color: theme.colorScheme.error.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: theme.colorScheme.error.withValues(alpha: 0.3),
+            ),
           ),
           child: Row(
             children: [
@@ -489,7 +595,11 @@ class NotificationActionScreen extends ConsumerWidget {
             color: theme.colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 20, color: theme.colorScheme.onPrimaryContainer),
+          child: Icon(
+            icon,
+            size: 20,
+            color: theme.colorScheme.onPrimaryContainer,
+          ),
         ),
         const SizedBox(width: 14),
         Expanded(
