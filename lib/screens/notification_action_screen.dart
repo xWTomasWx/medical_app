@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../providers/appointment_provider.dart';
 import '../models/appointment.dart';
 import '../widgets/decline_reason_dialog.dart';
+import '../widgets/app_bar_logo_title.dart';
 
 class NotificationActionScreen extends ConsumerWidget {
   final String appointmentId;
@@ -23,7 +24,7 @@ class NotificationActionScreen extends ConsumerWidget {
 
     if (appointment == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Detalle de Cita')),
+        appBar: AppBar(title: const AppBarLogoTitle('Detalle de Cita')),
         body: const Center(child: Text('Cita no encontrada o expirada.')),
       );
     }
@@ -36,7 +37,7 @@ class NotificationActionScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Confirmar Turno'),
+        title: const AppBarLogoTitle('Confirmar Turno'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),

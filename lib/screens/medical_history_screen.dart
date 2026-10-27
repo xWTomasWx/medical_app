@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../providers/appointment_provider.dart';
 import '../models/appointment.dart';
 import '../widgets/app_drawer.dart';
+import '../widgets/app_bar_logo_title.dart';
 
 class MedicalHistoryScreen extends ConsumerWidget {
   const MedicalHistoryScreen({super.key});
@@ -14,7 +15,7 @@ class MedicalHistoryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historial Clínico'),
+        title: const AppBarLogoTitle('Historial Clínico'),
       ),
       drawer: const AppDrawer(currentRoute: 'history'),
       body: pastAppointments.isEmpty

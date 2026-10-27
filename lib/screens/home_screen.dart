@@ -5,6 +5,7 @@ import '../providers/appointment_provider.dart';
 import '../models/appointment.dart';
 import 'notification_action_screen.dart';
 import '../widgets/app_drawer.dart';
+import '../widgets/app_bar_logo_title.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -17,7 +18,7 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(currentRoute: 'home'),
       appBar: AppBar(
-        title: const Text('Mis Citas'),
+        title: const AppBarLogoTitle('Mis Citas'),
         actions: [
           IconButton(
             icon: const Icon(Icons.notification_add),
